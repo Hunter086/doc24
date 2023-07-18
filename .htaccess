@@ -1,0 +1,4 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteRule ^api\.php/update-persona/([0-9]+)/([a-zA-Z0-9_-]+)/?$ api.php?id=$1&brand=$2 [QSA,NC,L]
