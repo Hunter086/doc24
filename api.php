@@ -7,17 +7,20 @@ require 'person_consult.php';
 use GuzzleHttp\guzzle;
 use GuzzleHttp\Client;
 //Ruta api.php?route=login
-if($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['route'] === 'login') {
-
-    $client_id= $_POST['client_id'];
-    $secret_id= $_POST['secret_id'];
-
-    $db_credentials = getCredential($client_id);
-    if ($client_id === $db_credentials['client_id'] && $secret_id === $db_credentials['secret_id']) {
-        $userData = array('secret_id' => $db_credentials['secret_id']);
-        $token = generateJWT($db_credentials['brand'],$db_credentials['client_id'],$db_credentials['secret_id']);
-        return json_encode(array('token' => $token));
-    } else {
+if($_SERVER['REQUEST_METHOD'] === 'POST'  && isset($_GET['route']) && $_GET['route'] === 'login') {
+    if(isset($_POST['client_id']) and isset($_POST['secret_id'])){
+        $client_id= $_POST['client_id'];
+        $secret_id= $_POST['secret_id'];
+    
+        $db_credentials = getCredential($client_id);
+        if ($client_id === $db_credentials['client_id'] && $secret_id === $db_credentials['secret_id']) {
+            $userData = array('secret_id' => $db_credentials['secret_id']);
+            $token = generateJWT($db_credentials['brand'],$db_credentials['client_id'],$db_credentials['secret_id']);
+            return json_encode(array('token' => $token));
+        } else {
+            return json_encode(array('estado' => 0, 'mensaje'=> 'Token no valido'));
+        }
+    }else {
         return json_encode(array('estado' => 0, 'mensaje'=> 'Token no valido'));
     }
 }
@@ -26,14 +29,16 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && preg_match('/\/update-persona\/(\d+)
     
     $id= $matches[1];
     $brand= $matches[2];
+    if(isset($_SERVER['HTTP_AUTHENTICATION_TOKEN']) and 
+    isset($_POST['nombre']) and isset($_POST['apellido'])
+    and isset($_POST['edad']) and isset($_POST['telefono'])){
+        //traemos el token 
+        $post_token = $_SERVER['HTTP_AUTHENTICATION_TOKEN'];
         // Leer los datos enviados por POST
         $nombre = $_POST['nombre'];
         $apellido = $_POST['apellido'];
         $edad = $_POST['edad'];
         $telefono = $_POST['telefono'];
-    //traemos el token 
-    $post_token = $_SERVER['HTTP_AUTHENTICATION_TOKEN'];
-    if($post_token!= null){
 
         //traemos los datos
         $db_credentials = getCredential($id);
@@ -47,6 +52,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && preg_match('/\/update-persona\/(\d+)
         }else{
             return json_encode(array('estado' => 0, 'mensaje'=> 'Ha ocurrido un error al procesar la solicitud'));
         }
+    }else{
+        return json_encode(array('estado' => 0, 'mensaje'=> 'Ha ocurrido un error al procesar la solicitud'));
     }
 }
 /**
