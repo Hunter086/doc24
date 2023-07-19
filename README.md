@@ -11,5 +11,7 @@ cliente_id y secret_id a la direccion localhost:8000/api.php?route=login)
 
 Y recuerde que debe configurar los datos de la BD en config.ini
 
+Tambien puede ejecutar desde un cliente la funcion example_resquest($token, $nombre, $apellido, $edad, $telefono)
+
 
 
